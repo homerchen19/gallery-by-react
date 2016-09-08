@@ -26,11 +26,11 @@ function getDefaultModules() {
     loaders: [
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader!postcss-loader'
+        loader: 'style-loader!css-loader!postcss-loader!'
       },
       {
         test: /\.scss/,
-        loader: 'style-loader!css-loader!postcss-loader'
+        loader: 'style-loader!css-loader!postcss-loader!sass-loader?outputStyle=expanded'
       },
       {
         test: /\.styl/,
