@@ -131,7 +131,7 @@ class GalleryByReactApp extends React.Component {
             imgsArrangeArr.splice(topImgSpliceIndex, 0, imgsArrangeTopArr[0]); // 把上方的那張圖塞回imgsArrangeArr
         }
 
-        imgsArrangeArr.splice(centerIndex, 0, imgsArrangeArr[0]); // 把中間的圖也塞回imgsArrangeArr
+        imgsArrangeArr.splice(centerIndex, 0, imgsArrangeCenterArr[0]); // 把中間的圖也塞回imgsArrangeArr
 
         this.setState({
             imgsArrangeArr: imgsArrangeArr
@@ -179,7 +179,8 @@ class GalleryByReactApp extends React.Component {
         this.Constant.vPosRange.x[0] = halfStageW - imgW;
         this.Constant.vPosRange.x[1] = halfStageW;
 
-        this.rearrange(0);
+        let num = Math.floor(Math.random() * 13);
+        this.rearrange(num);
     }
 
     render() {
