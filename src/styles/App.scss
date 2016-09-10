@@ -1,7 +1,11 @@
-body,
-html {
+@mixin dis_whole {
   width: 100%;
   height: 100%;
+}
+
+body,
+html {
+  @include dis_whole;
   background-color: #222;
 }
 .content {
@@ -30,7 +34,7 @@ html {
   @at-root{
     .img-figure {
       position: absolute;
-      
+
       width: 320px;
       height: 360px;
       margin: 0;
@@ -40,9 +44,30 @@ html {
 
       box-sizing: border-box;
 
+      cursor: pointer;
+      transform-style: preserve-3d;
+
+      &.is-inverse {
+        transform: rotateY(180deg);
+      }
+
       img {
         width: 100%;
       }
+    }
+
+    .img-back {
+      @include dis_whole;
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 30px;
+      box-sizing: border-box;
+      text-align: center;
+      color: #666;
+      transform: rotateY(180deg) translateZ(1px);
+      backface-visibility: hidden;
+      background: #fff;
     }
 
     figcaption {

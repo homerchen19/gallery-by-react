@@ -20,9 +20,31 @@ imageDatas = ((imageDatasArr) => {
 
 var getRangeRandom = (low, high) => Math.floor(Math.random() * (high - low) + low);
 
+// 得到0~30度之間的任意正負值
+var get30DegRandom = () => {
+    let deg = '';
+    deg = (Math.random() > 0.5) ? '' : '-';
+    return deg + Math.ceil(Math.random() * 30);
+};
+
+//  圖片本身component
 class ImgFigure extends React.Component{
     constructor (props) {
         super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    //  imgFigure的點擊處理函數
+    handleClick(e) {
+
+        if (this.props.arrange.isCenter) {
+            this.props.inverse();
+        } else {
+            this.props.center();
+        }
+
+        e.stopPropagation();
+        e.preventDefault();
     }
 
     render () {
@@ -34,19 +56,40 @@ class ImgFigure extends React.Component{
             styleObj = this.props.arrange.pos;
         }
 
+        //  如果圖片旋轉角度不為0
+        if(this.props.arrange.rotate) {
+            (['Moz', 'Ms', 'Webkit', '']).forEach((value) => {
+                styleObj[value + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+            })
+        }
+
+        let imgFigureClassName = 'img-figure';
+        imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse' : '';
+
         return (
-            <figure className="img-figure" style={styleObj}>
+            <figure className={imgFigureClassName}
+                style={styleObj}
+                onClick={this.handleClick}
+            >
                 <img src={this.props.data.imageURL}
                     alt={this.props.data.title}
                 />
                 <figcaption>
-                    <h2 className="img-title">{this.props.data.title}</h2>
+                    <h2 className="img-title">
+                        {this.props.data.title}
+                    </h2>
+                    <div className="img-back" onClick={this.handleClick}>
+                        <p>
+                            {this.props.data.desc}
+                        </p>
+                    </div>
                 </figcaption>
             </figure>
         )
     }
 }
 
+//  大框架component
 class GalleryByReactApp extends React.Component {
 
     constructor (props) {
@@ -68,8 +111,36 @@ class GalleryByReactApp extends React.Component {
         };
 
         this.state = {
-            imgsArrangeArr: []
+            // 存圖片的狀態訊息
+            imgsArrangeArr: [
+                // pos: {
+                //     left: 0,
+                //     top: 0
+                // },
+                // rotate: 0 ,  // 旋轉角度
+                // isInverse: false, //  圖片正反面
+                // isCenter: false //   圖片是否在中間
+            ]
         };
+    }
+
+    //  旋轉圖片
+    //  index是目前要旋轉的圖片的index值
+    inverse (index) {
+        return () => {
+            let imgsArrangeArr = this.state.imgsArrangeArr;
+            imgsArrangeArr[index].isInverse = !imgsArrangeArr[index].isInverse;
+            this.setState({
+                imgsArrangeArr: imgsArrangeArr
+            })
+        }
+    }
+
+    //  居中照片
+    center (index) {
+        return () => {
+            this.rearrange(index);
+        }
     }
 
     //  重新佈局所有圖片
@@ -95,8 +166,13 @@ class GalleryByReactApp extends React.Component {
 
             //  首先居中centerIndex這張圖片，centerIndex不用旋轉
             imgsArrangeCenterArr[0] = {
-                pos: centerPos
+                pos: centerPos,
+                rotate: 0,
+                isCenter: true
             };
+
+        // 居中的圖片不用旋轉
+        imgsArrangeCenterArr[0].rotate = 0;
 
         //  語出要放在上冊的圖片的狀態訊息
         topImgSpliceIndex = Math.floor(Math.random() * (imgsArrangeArr.length - topImgNum));
@@ -104,9 +180,13 @@ class GalleryByReactApp extends React.Component {
 
         //  佈局位於上側的圖片
         imgsArrangeTopArr.forEach((value, index) => {
-            imgsArrangeTopArr[index].pos = {
-                top: getRangeRandom(vPosRangeTopY[0], vPosRangeTopY[1]),
-                left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
+            imgsArrangeTopArr[index] = {
+                pos: {
+                    top: getRangeRandom(vPosRangeTopY[0], vPosRangeTopY[1]),
+                    left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
+                },
+                rotate: get30DegRandom(),
+                isCenter: false
             }
         });
 
@@ -121,9 +201,13 @@ class GalleryByReactApp extends React.Component {
                 hPosRangeLORX = hPosRangeRightSecX;
             }
 
-            imgsArrangeArr[i].pos = {
-                top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
-                left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
+            imgsArrangeArr[i] = {
+                pos: {
+                    top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
+                    left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
+                },
+                rotate: get30DegRandom(),
+                isCenter: false
             }
         }
 
@@ -189,18 +273,30 @@ class GalleryByReactApp extends React.Component {
 
         imageDatas.forEach((value, index) => {
 
-            //  把每張圖先定在左上角
+            //  把每張圖先定在左上角，初始化
             if(!this.state.imgsArrangeArr[index]) {
                 this.state.imgsArrangeArr[index] = {
                     pos: {
                         left: 0,
                         top: 0
-                    }
+                    },
+                    rotate: 0,
+                    isInverse: false,
+                    isCenter: false
                 }
             }
 
             //產生DOM節點，放進array裡
-            imgFigures.push(<ImgFigure data={value} key={index} ref={'imgFigure' + index} arrange={this.state.imgsArrangeArr[index]}/>);
+            imgFigures.push(
+                <ImgFigure
+                    data={value}
+                    key={index}
+                    ref={'imgFigure' + index}
+                    arrange={this.state.imgsArrangeArr[index]}
+                    inverse={this.inverse(index)}
+                    center={this.center(index)}
+                />
+            );
         });
 
         return (
