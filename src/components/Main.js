@@ -57,10 +57,14 @@ class ImgFigure extends React.Component{
         }
 
         //  如果圖片旋轉角度不為0
-        if(this.props.arrange.rotate) {
+        if (this.props.arrange.rotate) {
             (['Moz', 'Ms', 'Webkit', '']).forEach((value) => {
                 styleObj[value + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
             })
+        }
+
+        if (this.props.arrange.isCenter) {
+            styleObj.zIndex = 50;
         }
 
         let imgFigureClassName = 'img-figure';
