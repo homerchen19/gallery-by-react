@@ -329,7 +329,7 @@ class GalleryByReactApp extends React.Component {
             imgFigures.push(
                 <ImgFigure
                     data={value}
-                    key={index} //  以防每次React都要渲染一次（因為React會比較virtual DOM前後差異）
+                    key={index} //  以防每次React
                     ref={'imgFigure' + index}
                     arrange={this.state.imgsArrangeArr[index]}
                     inverse={this.inverse(index)}
