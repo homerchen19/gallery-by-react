@@ -58,7 +58,7 @@ class ImgFigure extends React.Component{
 
         //  如果圖片旋轉角度不為0
         if (this.props.arrange.rotate) {
-            (['Moz', 'Ms', 'Webkit', '']).forEach((value) => {
+            (['Moz', 'ms', 'Webkit', '']).forEach((value) => {
                 styleObj[value + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
             })
         }
@@ -89,6 +89,41 @@ class ImgFigure extends React.Component{
                     </div>
                 </figcaption>
             </figure>
+        )
+    }
+}
+
+class ControllerUnit extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick (e) {
+        if (this.props.arrange.isCenter) {
+            this.props.inverse();
+        } else {
+            this.props.center();
+        }
+
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    render () {
+        let controllerUnitClassName = 'controller-unit';
+
+        if (this.props.arrange.isCenter) {
+            controllerUnitClassName += ' is-center';
+
+            if (this.props.arrange.isInverse) {
+                controllerUnitClassName += ' is-inverse';
+            }
+        }
+
+        return (
+            <span className={controllerUnitClassName} onClick={this.handleClick}></span>
         )
     }
 }
@@ -294,8 +329,16 @@ class GalleryByReactApp extends React.Component {
             imgFigures.push(
                 <ImgFigure
                     data={value}
-                    key={index}
+                    key={index} //  以防每次React都要渲染一次（因為React會比較virtual DOM前後差異）
                     ref={'imgFigure' + index}
+                    arrange={this.state.imgsArrangeArr[index]}
+                    inverse={this.inverse(index)}
+                    center={this.center(index)}
+                />
+            );
+            controllerUnits.push(
+                <ControllerUnit
+                    key={index}
                     arrange={this.state.imgsArrangeArr[index]}
                     inverse={this.inverse(index)}
                     center={this.center(index)}
